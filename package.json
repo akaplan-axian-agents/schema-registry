@@ -10,7 +10,7 @@
     "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-branches=95 --test-coverage-functions=98 --test-coverage-lines=99"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
