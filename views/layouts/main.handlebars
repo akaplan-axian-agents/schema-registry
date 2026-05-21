@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="{{language}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}} - {{t "app.name"}}</title>
+  <link rel="stylesheet" href="/static/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/catalog/">{{t "app.name"}}</a>
+    <nav aria-label="Primary">
+      <a href="/catalog/">{{t "nav.catalog"}}</a>
+      <a href="/hosted/schemas/index.json">{{t "nav.hostedJson"}}</a>
+      <a class="button-link" href="/manage/new">{{t "nav.newSchema"}}</a>
+    </nav>
+  </header>
+  <main>
+    {{{body}}}
+  </main>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<article class="schema-card">
+  <div>
+    <h2><a href="{{catalogPath}}">{{title}}</a></h2>
+    {{#if hasDescription}}
+      <p>{{description}}</p>
+    {{else}}
+      <p>{{t "schema.noDescription"}}</p>
+    {{/if}}
+  </div>
+  <dl>
+    <div><dt>{{t "schema.id"}}</dt><dd>{{id}}</dd></div>
+    <div><dt>{{t "schema.properties"}}</dt><dd>{{propertyCount}}</dd></div>
+    <div><dt>{{t "schema.required"}}</dt><dd>{{requiredCount}}</dd></div>
+  </dl>
+  <div class="card-actions">
+    <a href="{{hostedPath}}">{{t "nav.hostedJson"}}</a>
+    <a href="{{editPath}}">{{t "schema.edit"}}</a>
+  </div>
+</article>

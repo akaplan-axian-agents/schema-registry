@@ -1,0 +1,26 @@
+<section class="page-heading compact">
+  <p class="eyebrow">{{t "form.management"}}</p>
+  <h1>{{pageTitle}}</h1>
+</section>
+{{#if hasError}}
+  <p class="error" role="alert">{{error}}</p>
+{{/if}}
+<form class="editor-form" method="post" action="{{action}}">
+  <label for="schema_id">{{t "form.schemaId"}}</label>
+  {{#if isExisting}}
+    <input id="schema_id" name="schema_id" value="{{schemaId}}" readonly>
+  {{else}}
+    <input id="schema_id" name="schema_id" value="{{schemaId}}" required>
+  {{/if}}
+  <label for="document">{{t "form.schemaJson"}}</label>
+  <textarea id="document" name="document" spellcheck="false" required>{{document}}</textarea>
+  <div class="form-actions">
+    <button type="submit">{{t "form.saveSchema"}}</button>
+    <a class="button-link secondary" href="/catalog/">{{t "form.cancel"}}</a>
+  </div>
+</form>
+{{#if isExisting}}
+  <form class="delete-form" method="post" action="{{deletePath}}">
+    <button class="danger" type="submit">{{t "form.deleteSchema"}}</button>
+  </form>
+{{/if}}

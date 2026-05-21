@@ -1,0 +1,39 @@
+{
+  "$id": "https://schemas.example.test/hosted/schemas/subscription.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A recurring subscription attached to a customer account.",
+  "properties": {
+    "customer_id": {
+      "pattern": "^cus_[A-Za-z0-9]+$",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^sub_[A-Za-z0-9]+$",
+      "type": "string"
+    },
+    "plan": {
+      "type": "string"
+    },
+    "renewal_date": {
+      "format": "date",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "trialing",
+        "active",
+        "canceled"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "customer_id",
+    "plan",
+    "status"
+  ],
+  "title": "Subscription",
+  "type": "object"
+}

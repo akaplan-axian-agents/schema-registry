@@ -1,0 +1,35 @@
+{
+  "$id": "https://schemas.example.test/hosted/schemas/customer.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A customer profile used by account and billing systems.",
+  "properties": {
+    "email": {
+      "format": "email",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^cus_[A-Za-z0-9]+$",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused",
+        "closed"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "email",
+    "status"
+  ],
+  "title": "Customer",
+  "type": "object"
+}

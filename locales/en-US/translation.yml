@@ -1,0 +1,31 @@
+app.name: JSON Schema Registry
+nav.catalog: Catalog
+nav.hostedJson: Hosted JSON
+nav.newSchema: New schema
+catalog.eyebrow: Human website
+catalog.heading: Available schemas
+catalog.intro: Browse published JSON Schemas, open their canonical hosted URLs, or manage the local source files.
+catalog.empty: No schemas have been published yet.
+schema.eyebrow: Schema
+schema.openHostedJson: Open hosted JSON
+schema.edit: Edit
+schema.id: ID
+schema.draft: Draft
+schema.properties: Properties
+schema.required: Required
+schema.updated: Updated
+schema.hostedPath: Hosted path
+schema.requiredFields: Required fields
+schema.noRequiredFields: No required fields declared.
+schema.schemaJson: Schema JSON
+schema.noDescription: No description provided.
+form.management: Management
+form.schemaId: Schema ID
+form.schemaJson: Schema JSON
+form.saveSchema: Save schema
+form.cancel: Cancel
+form.deleteSchema: Delete schema
+form.newSchemaTitle: New schema
+message.notFound: Not found
+message.genericError: Something needs attention
+message.pageDoesNotExist: The requested page does not exist.

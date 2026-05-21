@@ -1,0 +1,31 @@
+app.name: Registro de JSON Schema
+nav.catalog: Catalogo
+nav.hostedJson: JSON publicado
+nav.newSchema: Nuevo schema
+catalog.eyebrow: Sitio para personas
+catalog.heading: Schemas disponibles
+catalog.intro: Explora JSON Schemas publicados, abre sus URL canonicas o administra los archivos locales.
+catalog.empty: Todavia no se ha publicado ningun schema.
+schema.eyebrow: Schema
+schema.openHostedJson: Abrir JSON publicado
+schema.edit: Editar
+schema.id: ID
+schema.draft: Borrador
+schema.properties: Propiedades
+schema.required: Requeridos
+schema.updated: Actualizado
+schema.hostedPath: Ruta publicada
+schema.requiredFields: Campos requeridos
+schema.noRequiredFields: No hay campos requeridos declarados.
+schema.schemaJson: JSON del schema
+schema.noDescription: No se proporciono descripcion.
+form.management: Administracion
+form.schemaId: ID del schema
+form.schemaJson: JSON del schema
+form.saveSchema: Guardar schema
+form.cancel: Cancelar
+form.deleteSchema: Eliminar schema
+form.newSchemaTitle: Nuevo schema
+message.notFound: No encontrado
+message.genericError: Algo necesita atencion
+message.pageDoesNotExist: La pagina solicitada no existe.

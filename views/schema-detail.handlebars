@@ -1,0 +1,35 @@
+<section class="detail-header">
+  <div>
+    <p class="eyebrow">{{t "schema.eyebrow"}}</p>
+    <h1>{{title}}</h1>
+    {{#if hasDescription}}
+      <p>{{description}}</p>
+    {{else}}
+      <p>{{t "schema.noDescription"}}</p>
+    {{/if}}
+  </div>
+  <div class="actions">
+    <a class="button-link" href="{{hostedPath}}">{{t "schema.openHostedJson"}}</a>
+    <a class="button-link secondary" href="{{editPath}}">{{t "schema.edit"}}</a>
+  </div>
+</section>
+<dl class="metadata">
+  <div><dt>{{t "schema.id"}}</dt><dd>{{id}}</dd></div>
+  <div><dt>{{t "schema.draft"}}</dt><dd>{{draft}}</dd></div>
+  <div><dt>{{t "schema.properties"}}</dt><dd>{{propertyCount}}</dd></div>
+  <div><dt>{{t "schema.required"}}</dt><dd>{{requiredCount}}</dd></div>
+  <div><dt>{{t "schema.updated"}}</dt><dd>{{updatedAt}}</dd></div>
+  <div><dt>{{t "schema.hostedPath"}}</dt><dd><code>{{hostedPath}}</code></dd></div>
+</dl>
+<section>
+  <h2>{{t "schema.requiredFields"}}</h2>
+  {{#if hasRequiredFields}}
+    <p>{{requiredFields}}</p>
+  {{else}}
+    <p>{{t "schema.noRequiredFields"}}</p>
+  {{/if}}
+</section>
+<section>
+  <h2>{{t "schema.schemaJson"}}</h2>
+  <pre><code>{{schemaJson}}</code></pre>
+</section>

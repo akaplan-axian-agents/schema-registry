@@ -1,0 +1,23 @@
+{
+  "name": "schema-registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Server-rendered JSON Schema hosting and management website with no browser JavaScript.",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-branches=95 --test-coverage-functions=98 --test-coverage-lines=99"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-handlebars": "^9.0.1",
+    "i18next": "^26.2.0",
+    "i18next-fs-backend": "^2.6.5",
+    "i18next-http-middleware": "^3.9.6"
+  }
+}

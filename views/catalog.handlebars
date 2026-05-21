@@ -1,0 +1,14 @@
+<section class="page-heading">
+  <p class="eyebrow">{{t "catalog.eyebrow"}}</p>
+  <h1>{{t "catalog.heading"}}</h1>
+  <p>{{t "catalog.intro"}}</p>
+</section>
+<section class="schema-grid" aria-label="Schemas">
+  {{#if hasRecords}}
+    {{#each records}}
+      {{> schema-card}}
+    {{/each}}
+  {{else}}
+    <p class="empty">{{t "catalog.empty"}}</p>
+  {{/if}}
+</section>
