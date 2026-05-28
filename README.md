@@ -74,3 +74,10 @@ npm run coverage
 
 The coverage script uses Node's built-in test runner coverage report and
 enforces high line, branch, and function coverage thresholds for `src/**/*.js`.
+
+## Versioning
+
+The project version is maintained in `package.json` and `package-lock.json`.
+When a pull request is merged into `main`, the Version Bump GitHub Actions
+workflow increments the npm patch version and commits the updated files back to
+`main`.
