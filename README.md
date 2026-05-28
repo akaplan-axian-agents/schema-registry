@@ -80,4 +80,5 @@ enforces high line, branch, and function coverage thresholds for `src/**/*.js`.
 The project version is maintained in `package.json` and `package-lock.json`.
 When a pull request is merged into `main`, the Version Bump GitHub Actions
 workflow increments the npm patch version and commits the updated files back to
-`main`.
+`main`. The workflow also tags the commit that was merged into `main` with the
+new version number and pushes that tag.

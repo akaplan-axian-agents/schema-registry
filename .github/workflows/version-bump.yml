@@ -48,5 +48,7 @@ jobs:
         run: |
           git add package.json package-lock.json
           git commit -m "chore: bump version to v${{ steps.version.outputs.number }} [skip ci]"
+          git tag "v${{ steps.version.outputs.number }}" "${{ github.event.pull_request.merge_commit_sha }}"
           git pull --rebase origin main
           git push origin HEAD:main
+          git push origin "v${{ steps.version.outputs.number }}"
