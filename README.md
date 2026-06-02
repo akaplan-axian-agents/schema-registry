@@ -89,8 +89,8 @@ branch.
 
 To keep the pending version correct, do not merge stale pull request branches
 into `main`. The repository uses GitHub merge queue for pull requests targeting
-`main`, so GitHub tests queued changes against the latest base branch before
-merging them. The Tests workflow includes the `merge_group` trigger required for
-merge queue validation. Direct post-merge pushes from the Version Bump workflow
-are allowed to bypass the queue so `main` can advance to the next pending
-version.
+`main`, so GitHub queues pull requests against the latest base branch before
+merging them. The Tests workflow includes the `merge_group` trigger needed if
+required merge-queue checks are added later. Direct post-merge pushes from the
+Version Bump workflow are not routed through the queue, so `main` can advance to
+the next pending version.
