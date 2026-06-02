@@ -38,17 +38,26 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Increment patch version
+      - name: Read merge commit version
         id: version
         run: |
-          new_version="$(npm version patch --no-git-tag-version --ignore-scripts)"
-          echo "number=${new_version#v}" >> "$GITHUB_OUTPUT"
+          release_version="$(
+            git show "${{ github.event.pull_request.merge_commit_sha }}:package.json" |
+            node -e "let input = ''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => console.log(JSON.parse(input).version));"
+          )"
+          echo "release=$release_version" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare next main version
+        id: next-version
+        run: |
+          next_version="$(npm version patch --no-git-tag-version --ignore-scripts)"
+          echo "number=${next_version#v}" >> "$GITHUB_OUTPUT"
 
       - name: Commit version bump
         run: |
           git add package.json package-lock.json
-          git commit -m "chore: bump version to v${{ steps.version.outputs.number }} [skip ci]"
-          git tag "v${{ steps.version.outputs.number }}" "${{ github.event.pull_request.merge_commit_sha }}"
+          git commit -m "chore: prepare version v${{ steps.next-version.outputs.number }} [skip ci]"
+          git tag "v${{ steps.version.outputs.release }}" "${{ github.event.pull_request.merge_commit_sha }}"
           git pull --rebase origin main
           git push origin HEAD:main
-          git push origin "v${{ steps.version.outputs.number }}"
+          git push origin "v${{ steps.version.outputs.release }}"

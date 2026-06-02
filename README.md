@@ -78,7 +78,18 @@ enforces high line, branch, and function coverage thresholds for `src/**/*.js`.
 ## Versioning
 
 The project version is maintained in `package.json` and `package-lock.json`.
+The `main` branch HEAD carries the version number for the next merge. Branches
+created from `main` inherit that pending version, so a pull request merge commit
+already contains the version it will release.
+
 When a pull request is merged into `main`, the Version Bump GitHub Actions
-workflow increments the npm patch version and commits the updated files back to
-`main`. The workflow also tags the commit that was merged into `main` with the
-new version number and pushes that tag.
+workflow tags that merge commit with the version already present in
+`package.json`, then commits the next patch version back to `main` for the next
+branch.
+
+To keep the pending version correct, configure GitHub to prevent stale pull
+request branches from merging into `main`. The intended repository setting is a
+branch protection rule or ruleset for `main` that requires the `Node 24.x`
+status check and enables "Require branches to be up to date before merging".
+For higher-volume work, GitHub merge queue can provide the same latest-`main`
+guarantee while letting GitHub update and test queued changes automatically.
