@@ -1,6 +1,6 @@
 {
   "name": "schema-registry",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "type": "module",
   "description": "Server-rendered JSON Schema hosting and management website with no browser JavaScript.",
