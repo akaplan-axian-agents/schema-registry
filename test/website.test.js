@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  catalogView,
-  editSchemaFormView,
-  messageView,
-  newSchemaFormView,
-  schemaDetailView,
-} from "../src/website.js";
+import { catalogView, editSchemaFormView, messageView, newSchemaFormView, schemaDetailView } from "../src/website.js";
 
 function record(overrides = {}) {
   return {

@@ -9,21 +9,24 @@ import {
 
 export async function createRegistryApp({ store, staticRoot, viewsRoot, localesRoot, i18n = null }) {
   const app = express();
-  const i18nInstance = i18n || await createI18n({ localesRoot });
+  const i18nInstance = i18n || (await createI18n({ localesRoot }));
   const renderView = (req, res, status, view, data) => render(req, res, status, view, data);
 
   app.locals.store = store;
   app.locals.staticRoot = staticRoot;
   app.locals.viewsRoot = viewsRoot;
 
-  app.engine("handlebars", engine({
-    helpers: {
-      t(key, options) {
-        const language = options.data.root.language || fallbackLanguage;
-        return i18nInstance.getFixedT(language)(key);
+  app.engine(
+    "handlebars",
+    engine({
+      helpers: {
+        t(key, options) {
+          const language = options.data.root.language || fallbackLanguage;
+          return i18nInstance.getFixedT(language)(key);
+        },
       },
-    },
-  }));
+    }),
+  );
   app.set("view engine", "handlebars");
   app.set("views", viewsRoot);
   app.use(express.urlencoded({ extended: false, limit: "1mb" }));
@@ -65,7 +68,11 @@ function i18nTranslate(req, language) {
 }
 
 function copyLanguageHeaderForHtmlRequests(req, _res, next) {
-  if (isHtmlRoute(req) && req.headers.language && (!req.headers["accept-language"] || req.headers["accept-language"] === "*")) {
+  if (
+    isHtmlRoute(req) &&
+    req.headers.language &&
+    (!req.headers["accept-language"] || req.headers["accept-language"] === "*")
+  ) {
     req.headers["accept-language"] = req.headers.language;
   }
   next();

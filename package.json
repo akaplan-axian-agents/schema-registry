@@ -7,7 +7,18 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test",
-    "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-branches=95 --test-coverage-functions=98 --test-coverage-lines=99"
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-branches=95 --test-coverage-functions=98 --test-coverage-lines=99",
+    "format:check": "prettier \"**/*.{css,js,json,md,yml,yaml}\" --check",
+    "format:fix": "prettier \"**/*.{css,js,json,md,yml,yaml}\" --write",
+    "deps:check": "knip",
+    "deps:fix": "knip --fix && npm install --package-lock-only --ignore-scripts",
+    "lint": "eslint .",
+    "security:audit": "npm audit --audit-level=high",
+    "security:secrets": "secretlint \"**/*\" \".github/**/*\"",
+    "check:source": "npm run format:check && npm run deps:check",
+    "fix:source": "npm run format:fix && npm run deps:fix",
+    "check:inspect": "npm run lint && npm run security:audit && npm run security:secrets",
+    "verify": "npm run check:source && npm run check:inspect && npm run coverage"
   },
   "engines": {
     "node": ">=24"
@@ -19,5 +30,13 @@
     "i18next": "^26.2.0",
     "i18next-fs-backend": "^2.6.5",
     "i18next-http-middleware": "^3.9.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
+    "eslint": "^10.4.1",
+    "knip": "^6.15.0",
+    "prettier": "^3.8.3",
+    "secretlint": "^13.0.2"
   }
 }

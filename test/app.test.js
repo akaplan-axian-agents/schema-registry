@@ -352,7 +352,10 @@ test("hosted schema index lists available schemas", async () => {
 
     assert.equal(response.status, 200);
     assert.match(response.headers.get("content-type"), /application\/json/);
-    assert.deepEqual(payload.schemas.map((schema) => schema.id), ["invoice"]);
+    assert.deepEqual(
+      payload.schemas.map((schema) => schema.id),
+      ["invoice"],
+    );
     assert.equal(payload.schemas[0].schema, "/hosted/schemas/invoice.schema.json");
   } finally {
     await closeServer(server);

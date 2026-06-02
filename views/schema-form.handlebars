@@ -8,9 +8,9 @@
 <form class="editor-form" method="post" action="{{action}}">
   <label for="schema_id">{{t "form.schemaId"}}</label>
   {{#if isExisting}}
-    <input id="schema_id" name="schema_id" value="{{schemaId}}" readonly>
+    <input id="schema_id" name="schema_id" value="{{schemaId}}" readonly />
   {{else}}
-    <input id="schema_id" name="schema_id" value="{{schemaId}}" required>
+    <input id="schema_id" name="schema_id" value="{{schemaId}}" required />
   {{/if}}
   <label for="document">{{t "form.schemaJson"}}</label>
   <textarea id="document" name="document" spellcheck="false" required>{{document}}</textarea>
