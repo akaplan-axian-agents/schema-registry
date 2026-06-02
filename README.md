@@ -93,7 +93,8 @@ inspect-only checks, and coverage.
 
 In GitHub Actions, the Tests workflow first runs source fixes on same-repository
 branches. If that step changes files, it commits the changes back to the branch
-and stops the current run so the next workflow run validates the updated commit.
+and skips validation in the current run so the next workflow run validates the
+updated commit.
 
 ## Versioning
 
