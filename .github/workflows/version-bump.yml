@@ -38,15 +38,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Verify checked out main is the PR merge commit
-        run: |
-          checked_out_sha="$(git rev-parse HEAD)"
-          if [ "$checked_out_sha" != "${{ github.event.pull_request.merge_commit_sha }}" ]; then
-            echo "Checked out main at $checked_out_sha, but this workflow was triggered for merge commit ${{ github.event.pull_request.merge_commit_sha }}."
-            echo "Refusing to advance the HEAD-based version because main changed before this workflow ran."
-            exit 1
-          fi
-
       - name: Read merge commit version
         id: version
         run: |

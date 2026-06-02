@@ -86,3 +86,10 @@ When a pull request is merged into `main`, the Version Bump GitHub Actions
 workflow tags that merge commit with the version already present in
 `package.json`, then commits the next patch version back to `main` for the next
 branch.
+
+To keep the pending version correct, configure GitHub to prevent stale pull
+request branches from merging into `main`. The intended repository setting is a
+branch protection rule or ruleset for `main` that requires the `Node 24.x`
+status check and enables "Require branches to be up to date before merging".
+For higher-volume work, GitHub merge queue can provide the same latest-`main`
+guarantee while letting GitHub update and test queued changes automatically.
