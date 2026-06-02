@@ -3,7 +3,6 @@ name: Tests
 on:
   push:
   merge_group:
-  pull_request:
 
 permissions:
   contents: read
@@ -11,7 +10,7 @@ permissions:
 jobs:
   auto-fix:
     name: Auto-fix source
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -31,7 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          ref: ${{ github.ref_name }}
           token: ${{ secrets.VERSION_BUMP_TOKEN }}
 
       - name: Set up Node
