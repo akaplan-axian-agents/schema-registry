@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "coverageAnalysis": "off",
-  "mutate": ["src/**/*.js", "!src/server.js"],
+  "mutate": ["src/**/*.js", "!src/server.js", "!src/types.js"],
   "packageManager": "npm",
   "reporters": ["progress", "clear-text", "html"],
   "tap": {

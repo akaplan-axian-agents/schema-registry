@@ -1,3 +1,9 @@
+/**
+ * Builds the machine-readable hosted schema index response.
+ *
+ * @param {import("./types.js").SchemaRecord[]} records
+ * @returns {import("./types.js").HostedResponse}
+ */
 export function hostedIndex(records) {
   const payload = {
     schemas: records.map((record) => ({
@@ -12,6 +18,12 @@ export function hostedIndex(records) {
   return jsonResponse(200, payload, "application/json; charset=utf-8");
 }
 
+/**
+ * Builds the hosted JSON Schema document response.
+ *
+ * @param {{ raw: import("./types.js").JsonSchemaDocument }} record
+ * @returns {import("./types.js").HostedResponse}
+ */
 export function hostedSchema(record) {
   return {
     status: 200,
@@ -23,6 +35,14 @@ export function hostedSchema(record) {
   };
 }
 
+/**
+ * Serializes a JSON payload into a response object.
+ *
+ * @param {number} status
+ * @param {unknown} payload
+ * @param {string} contentType
+ * @returns {import("./types.js").HostedResponse}
+ */
 function jsonResponse(status, payload, contentType) {
   return {
     status,

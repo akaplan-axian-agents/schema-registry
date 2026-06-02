@@ -95,13 +95,15 @@ Source-modifying tools are grouped separately from inspect-only tools.
 npm run fix:source
 npm run check:source
 npm run check:inspect
+npm run typecheck
 npm run verify
 ```
 
 `npm run fix:source` runs Prettier and Knip fixes. `npm run check:source`
 checks those tools without modifying files. `npm run check:inspect` runs
-ESLint, npm audit, and Secretlint. `npm run verify` runs source checks,
-inspect-only checks, coverage, and mutation testing.
+ESLint, TypeScript type checking from JSDoc, npm audit, and Secretlint.
+`npm run verify` runs source checks, inspect-only checks, coverage, and
+mutation testing.
 
 In GitHub Actions, the Tests workflow first runs source fixes on same-repository
 branches. If that step changes files, it commits the changes back to the branch

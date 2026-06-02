@@ -15,10 +15,22 @@ const defaults = {
   localesRoot: path.join(projectRoot, "locales"),
 };
 
+/**
+ * Loads environment variables from dotenv without overriding existing values.
+ *
+ * @param {import("dotenv").DotenvConfigOptions} [options]
+ * @returns {import("dotenv").DotenvConfigOutput}
+ */
 export function loadDotenv(options = {}) {
   return dotenv.config({ quiet: true, ...options });
 }
 
+/**
+ * Reads runtime configuration from environment variables and defaults.
+ *
+ * @param {NodeJS.ProcessEnv} [env]
+ * @returns {import("./types.js").RegistryConfig}
+ */
 export function readConfig(env = process.env) {
   return {
     host: env.HOST || defaults.host,
@@ -30,6 +42,12 @@ export function readConfig(env = process.env) {
   };
 }
 
+/**
+ * Builds the configured Express application.
+ *
+ * @param {import("./types.js").RegistryConfig} [config]
+ * @returns {Promise<import("express").Express>}
+ */
 export async function buildApp(config = readConfig()) {
   return createRegistryApp({
     store: new FileSystemSchemaStore(config.schemaRoot),
@@ -39,11 +57,25 @@ export async function buildApp(config = readConfig()) {
   });
 }
 
+/**
+ * Parses a positive integer port or returns the configured fallback.
+ *
+ * @param {string | undefined} value
+ * @param {number} fallback
+ * @returns {number}
+ */
 function readPort(value, fallback) {
   const port = Number.parseInt(value || "", 10);
   return Number.isInteger(port) && port > 0 ? port : fallback;
 }
 
+/**
+ * Resolves a configured path or its default relative to the current process.
+ *
+ * @param {string | undefined} value
+ * @param {string} fallback
+ * @returns {string}
+ */
 function resolveConfiguredPath(value, fallback) {
   return path.resolve(value || fallback);
 }
