@@ -87,9 +87,10 @@ workflow tags that merge commit with the version already present in
 `package.json`, then commits the next patch version back to `main` for the next
 branch.
 
-To keep the pending version correct, configure GitHub to prevent stale pull
-request branches from merging into `main`. The intended repository setting is a
-branch protection rule or ruleset for `main` that requires the `Node 24.x`
-status check and enables "Require branches to be up to date before merging".
-For higher-volume work, GitHub merge queue can provide the same latest-`main`
-guarantee while letting GitHub update and test queued changes automatically.
+To keep the pending version correct, do not merge stale pull request branches
+into `main`. The repository uses GitHub merge queue for pull requests targeting
+`main`, so GitHub tests queued changes against the latest base branch before
+merging them. The Tests workflow includes the `merge_group` trigger required for
+merge queue validation. Direct post-merge pushes from the Version Bump workflow
+are allowed to bypass the queue so `main` can advance to the next pending
+version.
