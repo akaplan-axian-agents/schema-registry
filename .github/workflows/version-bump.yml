@@ -21,11 +21,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Verify version bump token is available
+        env:
+          VERSION_BUMP_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
+        run: |
+          if [ -z "$VERSION_BUMP_TOKEN" ]; then
+            echo "VERSION_BUMP_TOKEN is required so the version workflow can bypass repository rules for its direct main update."
+            exit 1
+          fi
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.VERSION_BUMP_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
