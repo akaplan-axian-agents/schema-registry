@@ -10,16 +10,7 @@ import {
 /**
  * Template data passed into the common Express render wrapper.
  *
- * @typedef {Record<string, unknown> & {
- *   title?: string,
- *   titleKey?: string,
- *   pageTitle?: string,
- *   pageTitleKey?: string,
- *   heading?: string,
- *   headingKey?: string,
- *   message?: string,
- *   messageKey?: string | null
- * }} RenderData
+ * @typedef {object} RenderData
  * @property {string} [title] Already-localized browser title text.
  * @property {string} [titleKey] Localization key for browser title text.
  * @property {string} [pageTitle] Already-localized page title text.
