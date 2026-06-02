@@ -75,6 +75,18 @@ npm run coverage
 The coverage script uses Node's built-in test runner coverage report and
 enforces high line, branch, and function coverage thresholds for `src/**/*.js`.
 
+## Mutation Testing
+
+```sh
+npm run mutation
+```
+
+Mutation testing uses Stryker with the Node test runner's TAP output to check
+whether existing unit tests fail when application source code is changed by
+small generated mutations. The Stryker configuration mutates `src/**/*.js`,
+excluding the runtime `src/server.js` entrypoint, and writes HTML reports under
+`reports/`. The current mutation score gate is 75%.
+
 ## CI Checks
 
 Source-modifying tools are grouped separately from inspect-only tools.
@@ -89,7 +101,7 @@ npm run verify
 `npm run fix:source` runs Prettier and Knip fixes. `npm run check:source`
 checks those tools without modifying files. `npm run check:inspect` runs
 ESLint, npm audit, and Secretlint. `npm run verify` runs source checks,
-inspect-only checks, and coverage.
+inspect-only checks, coverage, and mutation testing.
 
 In GitHub Actions, the Tests workflow first runs source fixes on same-repository
 branches. If that step changes files, it commits the changes back to the branch
