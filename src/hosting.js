@@ -1,8 +1,15 @@
 /**
+ * @typedef {object} HostedResponse
+ * @property {number} status
+ * @property {Record<string, string>} headers
+ * @property {string} [body]
+ */
+
+/**
  * Builds the machine-readable hosted schema index response.
  *
- * @param {import("./types.js").SchemaRecord[]} records
- * @returns {import("./types.js").HostedResponse}
+ * @param {import("./storage.js").SchemaRecord[]} records
+ * @returns {HostedResponse}
  */
 export function hostedIndex(records) {
   const payload = {
@@ -21,8 +28,8 @@ export function hostedIndex(records) {
 /**
  * Builds the hosted JSON Schema document response.
  *
- * @param {{ raw: import("./types.js").JsonSchemaDocument }} record
- * @returns {import("./types.js").HostedResponse}
+ * @param {{ raw: import("./storage.js").JsonSchemaDocument }} record
+ * @returns {HostedResponse}
  */
 export function hostedSchema(record) {
   return {
@@ -41,7 +48,7 @@ export function hostedSchema(record) {
  * @param {number} status
  * @param {unknown} payload
  * @param {string} contentType
- * @returns {import("./types.js").HostedResponse}
+ * @returns {HostedResponse}
  */
 function jsonResponse(status, payload, contentType) {
   return {

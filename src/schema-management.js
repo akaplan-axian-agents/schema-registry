@@ -4,11 +4,21 @@ import { SchemaError, SchemaNotFoundError, parseSchemaJson } from "./storage.js"
 import { catalogView, editSchemaFormView, messageView, newSchemaFormView, schemaDetailView } from "./website.js";
 
 /**
+ * @callback RenderFunction
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {number} status
+ * @param {string} view
+ * @param {Record<string, unknown>} data
+ * @returns {void}
+ */
+
+/**
  * Creates schema catalog, hosted schema, and management form routes.
  *
  * @param {{
- *   store: import("./types.js").SchemaStore,
- *   render: import("./types.js").RenderFunction
+ *   store: import("./storage.js").SchemaStore,
+ *   render: RenderFunction
  * }} options
  * @returns {import("express").Router}
  */
@@ -124,7 +134,7 @@ export function createSchemaManagementRouter({ store, render }) {
 /**
  * Creates the final HTML not-found handler for schema management routes.
  *
- * @param {{ render: import("./types.js").RenderFunction }} options
+ * @param {{ render: RenderFunction }} options
  * @returns {import("express").RequestHandler}
  */
 export function createSchemaManagementNotFoundHandler({ render }) {
@@ -136,7 +146,7 @@ export function createSchemaManagementNotFoundHandler({ render }) {
 /**
  * Creates the error handler that maps schema errors to user-facing pages.
  *
- * @param {{ render: import("./types.js").RenderFunction }} options
+ * @param {{ render: RenderFunction }} options
  * @returns {import("express").ErrorRequestHandler}
  */
 export function createSchemaManagementErrorHandler({ render }) {
@@ -165,7 +175,7 @@ export function createSchemaManagementErrorHandler({ render }) {
  * Writes a framework-neutral response object to Express.
  *
  * @param {import("express").Response} res
- * @param {import("./types.js").HostedResponse} response
+ * @param {import("./hosting.js").HostedResponse} response
  * @returns {void}
  */
 function sendResponse(res, response) {
@@ -191,11 +201,11 @@ function routeParam(value) {
 /**
  * Converts rejected async route promises into Express errors.
  *
- * @param {(req: import("./types.js").RegistryRequest, res: import("express").Response, next: import("express").NextFunction) => Promise<void>} handler
+ * @param {(req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<void>} handler
  * @returns {import("express").RequestHandler}
  */
 function asyncHandler(handler) {
   return (req, res, next) => {
-    Promise.resolve(handler(/** @type {import("./types.js").RegistryRequest} */ (req), res, next)).catch(next);
+    Promise.resolve(handler(req, res, next)).catch(next);
   };
 }

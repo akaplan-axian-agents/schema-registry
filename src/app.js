@@ -8,11 +8,24 @@ import {
 } from "./schema-management.js";
 
 /**
+ * @typedef {Record<string, unknown> & {
+ *   title?: unknown,
+ *   titleKey?: unknown,
+ *   pageTitle?: unknown,
+ *   pageTitleKey?: unknown,
+ *   heading?: unknown,
+ *   headingKey?: unknown,
+ *   message?: unknown,
+ *   messageKey?: unknown
+ * }} RenderData
+ */
+
+/**
  * Builds the Express application with schema storage, localization, templates,
  * and schema management routes wired together.
  *
  * @param {{
- *   store: import("./types.js").SchemaStore,
+ *   store: import("./storage.js").SchemaStore,
  *   staticRoot: string,
  *   viewsRoot: string,
  *   localesRoot: string,
@@ -23,7 +36,7 @@ import {
 export async function createRegistryApp({ store, staticRoot, viewsRoot, localesRoot, i18n = null }) {
   const app = express();
   const i18nInstance = i18n || (await createI18n({ localesRoot }));
-  /** @type {import("./types.js").RenderFunction} */
+  /** @type {import("./schema-management.js").RenderFunction} */
   const renderView = (req, res, status, view, data) => render(req, res, status, view, data);
 
   app.locals.store = store;
@@ -63,22 +76,22 @@ export async function createRegistryApp({ store, staticRoot, viewsRoot, localesR
 /**
  * Renders a template after filling common localized view fields.
  *
- * @param {import("./types.js").RegistryRequest} req
+ * @param {import("express").Request} req
  * @param {import("express").Response} res
  * @param {number} status
  * @param {string} view
- * @param {import("./types.js").RenderData} data
+ * @param {RenderData} data
  * @returns {void}
  */
 function render(req, res, status, view, data) {
-  const language = req.resolvedLanguage || req.language || fallbackLanguage;
+  const language = resolvedRequestLanguage(req) || req.language || fallbackLanguage;
   const translate = i18nTranslate(req, language);
   res.status(status).render(view, {
     ...data,
-    title: data.title || translateOptional(translate, data.titleKey),
-    pageTitle: data.pageTitle || translateOptional(translate, data.pageTitleKey),
-    heading: data.heading || translateOptional(translate, data.headingKey),
-    message: data.message || translateOptional(translate, data.messageKey),
+    title: stringValue(data.title) || translateOptional(translate, data.titleKey),
+    pageTitle: stringValue(data.pageTitle) || translateOptional(translate, data.pageTitleKey),
+    heading: stringValue(data.heading) || translateOptional(translate, data.headingKey),
+    message: stringValue(data.message) || translateOptional(translate, data.messageKey),
     language,
     translate,
   });
@@ -87,7 +100,7 @@ function render(req, res, status, view, data) {
 /**
  * Returns the request-bound translator, or a key echo fallback before i18n runs.
  *
- * @param {import("./types.js").RegistryRequest} req
+ * @param {import("express").Request} req
  * @param {string} language
  * @returns {(key: string) => string}
  */
@@ -104,31 +117,53 @@ function i18nTranslate(req, language) {
  * Translates an optional localization key.
  *
  * @param {(key: string) => string} translate
- * @param {string | null | undefined} key
+ * @param {unknown} key
  * @returns {string}
  */
 function translateOptional(translate, key) {
-  if (key) {
+  if (typeof key === "string" && key) {
     return translate(key);
   }
   return "";
 }
 
 /**
+ * Returns a value when it is a string, otherwise an empty string.
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+function stringValue(value) {
+  return typeof value === "string" ? value : "";
+}
+
+/**
+ * Reads optional i18next resolved language metadata from a request.
+ *
+ * @param {import("express").Request} req
+ * @returns {string}
+ */
+function resolvedRequestLanguage(req) {
+  const resolvedLanguage = /** @type {{ resolvedLanguage?: unknown }} */ (req).resolvedLanguage;
+  return stringValue(resolvedLanguage);
+}
+
+/**
  * Copies the fallback Language header into Accept-Language for HTML routes.
  *
- * @param {import("./types.js").RegistryRequest} req
+ * @param {import("express").Request} req
  * @param {import("express").Response} _res
  * @param {import("express").NextFunction} next
  * @returns {void}
  */
 function copyLanguageHeaderForHtmlRequests(req, _res, next) {
+  const languageHeader = req.headers.language;
   if (
     isHtmlRoute(req) &&
-    req.headers.language &&
+    typeof languageHeader === "string" &&
     (!req.headers["accept-language"] || req.headers["accept-language"] === "*")
   ) {
-    req.headers["accept-language"] = req.headers.language;
+    req.headers["accept-language"] = languageHeader;
   }
   next();
 }

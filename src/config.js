@@ -16,6 +16,16 @@ const defaults = {
 };
 
 /**
+ * @typedef {object} RegistryConfig
+ * @property {string} host
+ * @property {number} port
+ * @property {string} schemaRoot
+ * @property {string} staticRoot
+ * @property {string} viewsRoot
+ * @property {string} localesRoot
+ */
+
+/**
  * Loads environment variables from dotenv without overriding existing values.
  *
  * @param {import("dotenv").DotenvConfigOptions} [options]
@@ -29,7 +39,7 @@ export function loadDotenv(options = {}) {
  * Reads runtime configuration from environment variables and defaults.
  *
  * @param {NodeJS.ProcessEnv} [env]
- * @returns {import("./types.js").RegistryConfig}
+ * @returns {RegistryConfig}
  */
 export function readConfig(env = process.env) {
   return {
@@ -45,7 +55,7 @@ export function readConfig(env = process.env) {
 /**
  * Builds the configured Express application.
  *
- * @param {import("./types.js").RegistryConfig} [config]
+ * @param {RegistryConfig} [config]
  * @returns {Promise<import("express").Express>}
  */
 export async function buildApp(config = readConfig()) {

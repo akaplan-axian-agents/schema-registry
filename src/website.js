@@ -3,8 +3,8 @@ import { formatSchema } from "./storage.js";
 /**
  * Builds the catalog template data for schema summaries.
  *
- * @param {import("./types.js").SchemaRecord[]} records
- * @returns {import("./types.js").RenderData}
+ * @param {import("./storage.js").SchemaRecord[]} records
+ * @returns {Record<string, unknown>}
  */
 export function catalogView(records) {
   return {
@@ -17,8 +17,8 @@ export function catalogView(records) {
 /**
  * Builds the schema detail template data.
  *
- * @param {import("./types.js").SchemaRecord} record
- * @returns {import("./types.js").RenderData}
+ * @param {import("./storage.js").SchemaRecord} record
+ * @returns {Record<string, unknown>}
  */
 export function schemaDetailView(record) {
   const schema = schemaSummary(record);
@@ -35,7 +35,7 @@ export function schemaDetailView(record) {
  * Builds the blank new-schema form template data.
  *
  * @param {{ error?: string, schemaId?: string, document?: string }} [options]
- * @returns {import("./types.js").RenderData}
+ * @returns {Record<string, unknown>}
  */
 export function newSchemaFormView({ error = "", schemaId = "", document = "" } = {}) {
   return {
@@ -53,9 +53,9 @@ export function newSchemaFormView({ error = "", schemaId = "", document = "" } =
 /**
  * Builds the edit form template data for an existing schema.
  *
- * @param {import("./types.js").SchemaRecord} record
+ * @param {import("./storage.js").SchemaRecord} record
  * @param {{ error?: string, document?: string }} [options]
- * @returns {import("./types.js").RenderData}
+ * @returns {Record<string, unknown>}
  */
 export function editSchemaFormView(record, { error = "", document = "" } = {}) {
   return {
@@ -77,7 +77,7 @@ export function editSchemaFormView(record, { error = "", document = "" } = {}) {
  * @param {string} titleKey
  * @param {string | null} [messageKey]
  * @param {string} [message]
- * @returns {import("./types.js").RenderData}
+ * @returns {Record<string, unknown>}
  */
 export function messageView(titleKey, messageKey = null, message = "") {
   return {
@@ -108,8 +108,8 @@ function defaultFormDocument() {
 /**
  * Builds reusable schema summary template data.
  *
- * @param {import("./types.js").SchemaRecord} record
- * @returns {import("./types.js").RenderData}
+ * @param {import("./storage.js").SchemaRecord} record
+ * @returns {Record<string, unknown>}
  */
 function schemaSummary(record) {
   return {

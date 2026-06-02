@@ -3,6 +3,16 @@ import path from "node:path";
 
 const schemaIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
+/**
+ * @typedef {import("json-schema").JSONSchema7} JsonSchemaDocument
+ *
+ * @typedef {object} SchemaStore
+ * @property {() => Promise<SchemaRecord[]>} listSchemas
+ * @property {(schemaId: string) => Promise<SchemaRecord>} getSchema
+ * @property {(schemaId: string, schema: JsonSchemaDocument) => Promise<SchemaRecord>} saveSchema
+ * @property {(schemaId: string) => Promise<void>} deleteSchema
+ */
+
 export class SchemaError extends Error {
   /**
    * Creates an application error for invalid schema input or stored content.
@@ -27,7 +37,7 @@ export class SchemaNotFoundError extends Error {
   }
 }
 
-class SchemaRecord {
+export class SchemaRecord {
   /**
    * Creates the view and hosted representation of a schema file.
    *
@@ -37,7 +47,7 @@ class SchemaRecord {
    *   description: string,
    *   draft: string,
    *   filePath: string,
-   *   raw: import("./types.js").JsonSchemaDocument,
+   *   raw: JsonSchemaDocument,
    *   updatedAt: string
    * }} data
    */
@@ -107,7 +117,7 @@ export class FileSystemSchemaStore {
   /**
    * Lists all valid schema records in sorted id order.
    *
-   * @returns {Promise<import("./types.js").SchemaRecord[]>}
+   * @returns {Promise<SchemaRecord[]>}
    */
   async listSchemas() {
     await mkdir(this.root, { recursive: true });
@@ -121,7 +131,7 @@ export class FileSystemSchemaStore {
    * Reads a schema record by id.
    *
    * @param {string} schemaId
-   * @returns {Promise<import("./types.js").SchemaRecord>}
+   * @returns {Promise<SchemaRecord>}
    */
   async getSchema(schemaId) {
     const filePath = this.#pathForId(schemaId);
@@ -139,8 +149,8 @@ export class FileSystemSchemaStore {
    * Validates and writes a schema document by id.
    *
    * @param {string} schemaId
-   * @param {import("./types.js").JsonSchemaDocument} schema
-   * @returns {Promise<import("./types.js").SchemaRecord>}
+   * @param {JsonSchemaDocument} schema
+   * @returns {Promise<SchemaRecord>}
    */
   async saveSchema(schemaId, schema) {
     validateSchemaId(schemaId);
@@ -184,7 +194,7 @@ export class FileSystemSchemaStore {
    * Reads and validates a schema record from a file path.
    *
    * @param {string} filePath
-   * @returns {Promise<import("./types.js").SchemaRecord>}
+   * @returns {Promise<SchemaRecord>}
    */
   async #recordFromPath(filePath) {
     const fileName = path.basename(filePath);
@@ -222,7 +232,7 @@ export class FileSystemSchemaStore {
  * Parses and validates a JSON Schema document from a string.
  *
  * @param {string} document
- * @returns {import("./types.js").JsonSchemaDocument}
+ * @returns {JsonSchemaDocument}
  */
 export function parseSchemaJson(document) {
   let schema;
@@ -258,7 +268,7 @@ export function validateSchemaId(schemaId) {
  * Validates the currently supported JSON Schema document shape.
  *
  * @param {unknown} schema
- * @returns {asserts schema is import("./types.js").JsonSchemaDocument}
+ * @returns {asserts schema is JsonSchemaDocument}
  */
 export function validateSchemaDocument(schema) {
   if (!isPlainObject(schema)) {
@@ -292,7 +302,7 @@ export function formatSchema(schema) {
  * Checks whether a value is a non-array object.
  *
  * @param {unknown} value
- * @returns {value is import("./types.js").JsonObject}
+ * @returns {value is Record<string, unknown>}
  */
 function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
