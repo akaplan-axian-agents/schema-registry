@@ -16,13 +16,15 @@ const defaults = {
 };
 
 /**
+ * Runtime settings used to build and listen with the schema registry.
+ *
  * @typedef {object} RegistryConfig
- * @property {string} host
- * @property {number} port
- * @property {string} schemaRoot
- * @property {string} staticRoot
- * @property {string} viewsRoot
- * @property {string} localesRoot
+ * @property {string} host Network interface the HTTP server binds to.
+ * @property {number} port TCP port the HTTP server listens on.
+ * @property {string} schemaRoot Directory containing persisted JSON Schema files.
+ * @property {string} staticRoot Directory containing static browser assets.
+ * @property {string} viewsRoot Directory containing Handlebars view templates.
+ * @property {string} localesRoot Directory containing localization files.
  */
 
 /**

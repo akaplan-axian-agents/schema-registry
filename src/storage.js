@@ -4,13 +4,17 @@ import path from "node:path";
 const schemaIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 /**
+ * JSON Schema draft-07 document shape used for stored schema payloads.
+ *
  * @typedef {import("json-schema").JSONSchema7} JsonSchemaDocument
  *
+ * Persistence contract used by the schema management routes.
+ *
  * @typedef {object} SchemaStore
- * @property {() => Promise<SchemaRecord[]>} listSchemas
- * @property {(schemaId: string) => Promise<SchemaRecord>} getSchema
- * @property {(schemaId: string, schema: JsonSchemaDocument) => Promise<SchemaRecord>} saveSchema
- * @property {(schemaId: string) => Promise<void>} deleteSchema
+ * @property {() => Promise<SchemaRecord[]>} listSchemas Lists every stored schema record.
+ * @property {(schemaId: string) => Promise<SchemaRecord>} getSchema Reads one schema record by id.
+ * @property {(schemaId: string, schema: JsonSchemaDocument) => Promise<SchemaRecord>} saveSchema Stores a schema document under an id.
+ * @property {(schemaId: string) => Promise<void>} deleteSchema Deletes one stored schema by id.
  */
 
 export class SchemaError extends Error {

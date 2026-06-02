@@ -4,12 +4,14 @@ import { SchemaError, SchemaNotFoundError, parseSchemaJson } from "./storage.js"
 import { catalogView, editSchemaFormView, messageView, newSchemaFormView, schemaDetailView } from "./website.js";
 
 /**
+ * Renders an Express response from a template and view data.
+ *
  * @callback RenderFunction
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {number} status
- * @param {string} view
- * @param {Record<string, unknown>} data
+ * @param {import("express").Request} req Express request being handled.
+ * @param {import("express").Response} res Express response to render into.
+ * @param {number} status HTTP status code to send.
+ * @param {string} view Handlebars template name to render.
+ * @param {Record<string, unknown>} data View model passed to the template.
  * @returns {void}
  */
 

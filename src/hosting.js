@@ -1,8 +1,10 @@
 /**
+ * Framework-neutral HTTP response for hosted machine-readable schema routes.
+ *
  * @typedef {object} HostedResponse
- * @property {number} status
- * @property {Record<string, string>} headers
- * @property {string} [body]
+ * @property {number} status HTTP status code to send.
+ * @property {Record<string, string>} headers HTTP headers to attach to the response.
+ * @property {string} [body] Serialized response body, when the route has content.
  */
 
 /**

@@ -8,16 +8,26 @@ import {
 } from "./schema-management.js";
 
 /**
+ * Template data passed into the common Express render wrapper.
+ *
  * @typedef {Record<string, unknown> & {
- *   title?: unknown,
- *   titleKey?: unknown,
- *   pageTitle?: unknown,
- *   pageTitleKey?: unknown,
- *   heading?: unknown,
- *   headingKey?: unknown,
- *   message?: unknown,
- *   messageKey?: unknown
+ *   title?: string,
+ *   titleKey?: string,
+ *   pageTitle?: string,
+ *   pageTitleKey?: string,
+ *   heading?: string,
+ *   headingKey?: string,
+ *   message?: string,
+ *   messageKey?: string | null
  * }} RenderData
+ * @property {string} [title] Already-localized browser title text.
+ * @property {string} [titleKey] Localization key for browser title text.
+ * @property {string} [pageTitle] Already-localized page title text.
+ * @property {string} [pageTitleKey] Localization key for page title text.
+ * @property {string} [heading] Already-localized page heading text.
+ * @property {string} [headingKey] Localization key for page heading text.
+ * @property {string} [message] Already-localized status or error message text.
+ * @property {string | null} [messageKey] Localization key for status or error message text.
  */
 
 /**
@@ -88,10 +98,10 @@ function render(req, res, status, view, data) {
   const translate = i18nTranslate(req, language);
   res.status(status).render(view, {
     ...data,
-    title: stringValue(data.title) || translateOptional(translate, data.titleKey),
-    pageTitle: stringValue(data.pageTitle) || translateOptional(translate, data.pageTitleKey),
-    heading: stringValue(data.heading) || translateOptional(translate, data.headingKey),
-    message: stringValue(data.message) || translateOptional(translate, data.messageKey),
+    title: data.title || translateOptional(translate, data.titleKey),
+    pageTitle: data.pageTitle || translateOptional(translate, data.pageTitleKey),
+    heading: data.heading || translateOptional(translate, data.headingKey),
+    message: data.message || translateOptional(translate, data.messageKey),
     language,
     translate,
   });
@@ -117,7 +127,7 @@ function i18nTranslate(req, language) {
  * Translates an optional localization key.
  *
  * @param {(key: string) => string} translate
- * @param {unknown} key
+ * @param {string | null | undefined} key
  * @returns {string}
  */
 function translateOptional(translate, key) {
@@ -128,16 +138,6 @@ function translateOptional(translate, key) {
 }
 
 /**
- * Returns a value when it is a string, otherwise an empty string.
- *
- * @param {unknown} value
- * @returns {string}
- */
-function stringValue(value) {
-  return typeof value === "string" ? value : "";
-}
-
-/**
  * Reads optional i18next resolved language metadata from a request.
  *
  * @param {import("express").Request} req
@@ -145,7 +145,7 @@ function stringValue(value) {
  */
 function resolvedRequestLanguage(req) {
   const resolvedLanguage = /** @type {{ resolvedLanguage?: unknown }} */ (req).resolvedLanguage;
-  return stringValue(resolvedLanguage);
+  return typeof resolvedLanguage === "string" ? resolvedLanguage : "";
 }
 
 /**
