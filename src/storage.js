@@ -17,7 +17,7 @@ export class SchemaNotFoundError extends Error {
   }
 }
 
-export class SchemaRecord {
+class SchemaRecord {
   constructor({ id, title, description, draft, filePath, raw, updatedAt }) {
     this.id = id;
     this.title = title;

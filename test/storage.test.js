@@ -27,7 +27,10 @@ test("save, list, and get schema", async () => {
     assert.equal(record.id, "thing");
     assert.equal(record.propertyCount, 1);
     assert.equal((await store.getSchema("thing")).title, "Thing");
-    assert.deepEqual((await store.listSchemas()).map((item) => item.id), ["thing"]);
+    assert.deepEqual(
+      (await store.listSchemas()).map((item) => item.id),
+      ["thing"],
+    );
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }

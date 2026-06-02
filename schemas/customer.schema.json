@@ -17,19 +17,11 @@
       "type": "string"
     },
     "status": {
-      "enum": [
-        "active",
-        "paused",
-        "closed"
-      ],
+      "enum": ["active", "paused", "closed"],
       "type": "string"
     }
   },
-  "required": [
-    "id",
-    "email",
-    "status"
-  ],
+  "required": ["id", "email", "status"],
   "title": "Customer",
   "type": "object"
 }

@@ -75,6 +75,26 @@ npm run coverage
 The coverage script uses Node's built-in test runner coverage report and
 enforces high line, branch, and function coverage thresholds for `src/**/*.js`.
 
+## CI Checks
+
+Source-modifying tools are grouped separately from inspect-only tools.
+
+```sh
+npm run fix:source
+npm run check:source
+npm run check:inspect
+npm run verify
+```
+
+`npm run fix:source` runs Prettier and Knip fixes. `npm run check:source`
+checks those tools without modifying files. `npm run check:inspect` runs
+ESLint, npm audit, and Secretlint. `npm run verify` runs source checks,
+inspect-only checks, and coverage.
+
+In GitHub Actions, the Tests workflow first runs source fixes on same-repository
+branches. If that step changes files, it commits the changes back to the branch
+and stops the current run so the next workflow run validates the updated commit.
+
 ## Versioning
 
 The project version is maintained in `package.json` and `package-lock.json`.

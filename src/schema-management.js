@@ -1,13 +1,7 @@
 import express from "express";
 import { hostedIndex, hostedSchema } from "./hosting.js";
 import { SchemaError, SchemaNotFoundError, parseSchemaJson } from "./storage.js";
-import {
-  catalogView,
-  editSchemaFormView,
-  messageView,
-  newSchemaFormView,
-  schemaDetailView,
-} from "./website.js";
+import { catalogView, editSchemaFormView, messageView, newSchemaFormView, schemaDetailView } from "./website.js";
 
 export function createSchemaManagementRouter({ store, render }) {
   const router = express.Router();
@@ -16,79 +10,103 @@ export function createSchemaManagementRouter({ store, render }) {
     res.redirect(303, "/catalog/");
   });
 
-  router.get("/catalog/", asyncHandler(async (req, res) => {
-    render(req, res, 200, "catalog", catalogView(await store.listSchemas()));
-  }));
+  router.get(
+    "/catalog/",
+    asyncHandler(async (req, res) => {
+      render(req, res, 200, "catalog", catalogView(await store.listSchemas()));
+    }),
+  );
 
-  router.get("/catalog/:schemaId/", asyncHandler(async (req, res) => {
-    const record = await store.getSchema(req.params.schemaId);
-    render(req, res, 200, "schema-detail", schemaDetailView(record));
-  }));
+  router.get(
+    "/catalog/:schemaId/",
+    asyncHandler(async (req, res) => {
+      const record = await store.getSchema(req.params.schemaId);
+      render(req, res, 200, "schema-detail", schemaDetailView(record));
+    }),
+  );
 
-  router.get("/hosted/schemas/index.json", asyncHandler(async (_req, res) => {
-    sendResponse(res, hostedIndex(await store.listSchemas()));
-  }));
+  router.get(
+    "/hosted/schemas/index.json",
+    asyncHandler(async (_req, res) => {
+      sendResponse(res, hostedIndex(await store.listSchemas()));
+    }),
+  );
 
-  router.get("/hosted/schemas/:schemaFile", asyncHandler(async (req, res, next) => {
-    if (!req.params.schemaFile.endsWith(".schema.json")) {
-      next();
-      return;
-    }
+  router.get(
+    "/hosted/schemas/:schemaFile",
+    asyncHandler(async (req, res, next) => {
+      if (!req.params.schemaFile.endsWith(".schema.json")) {
+        next();
+        return;
+      }
 
-    const schemaId = req.params.schemaFile.slice(0, -".schema.json".length);
-    sendResponse(res, hostedSchema(await store.getSchema(schemaId)));
-  }));
+      const schemaId = req.params.schemaFile.slice(0, -".schema.json".length);
+      sendResponse(res, hostedSchema(await store.getSchema(schemaId)));
+    }),
+  );
 
   router.get("/manage/new", (req, res) => {
     render(req, res, 200, "schema-form", newSchemaFormView());
   });
 
-  router.post("/manage/new", asyncHandler(async (req, res) => {
-    const schemaId = String(req.body.schema_id || "").trim();
-    const document = String(req.body.document || "");
+  router.post(
+    "/manage/new",
+    asyncHandler(async (req, res) => {
+      const schemaId = String(req.body.schema_id || "").trim();
+      const document = String(req.body.document || "");
 
-    try {
-      const schema = parseSchemaJson(document);
-      await store.saveSchema(schemaId, schema);
-    } catch (error) {
-      if (error instanceof SchemaError) {
-        render(req, res, 400, "schema-form", newSchemaFormView({ error: error.message, schemaId, document }));
-        return;
+      try {
+        const schema = parseSchemaJson(document);
+        await store.saveSchema(schemaId, schema);
+      } catch (error) {
+        if (error instanceof SchemaError) {
+          render(req, res, 400, "schema-form", newSchemaFormView({ error: error.message, schemaId, document }));
+          return;
+        }
+        throw error;
       }
-      throw error;
-    }
 
-    res.redirect(303, `/catalog/${schemaId}/`);
-  }));
+      res.redirect(303, `/catalog/${schemaId}/`);
+    }),
+  );
 
-  router.get("/manage/:schemaId/edit", asyncHandler(async (req, res) => {
-    const record = await store.getSchema(req.params.schemaId);
-    render(req, res, 200, "schema-form", editSchemaFormView(record));
-  }));
+  router.get(
+    "/manage/:schemaId/edit",
+    asyncHandler(async (req, res) => {
+      const record = await store.getSchema(req.params.schemaId);
+      render(req, res, 200, "schema-form", editSchemaFormView(record));
+    }),
+  );
 
-  router.post("/manage/:schemaId/edit", asyncHandler(async (req, res) => {
-    const schemaId = req.params.schemaId;
-    const document = String(req.body.document || "");
+  router.post(
+    "/manage/:schemaId/edit",
+    asyncHandler(async (req, res) => {
+      const schemaId = req.params.schemaId;
+      const document = String(req.body.document || "");
 
-    try {
-      const schema = parseSchemaJson(document);
-      await store.saveSchema(schemaId, schema);
-    } catch (error) {
-      if (error instanceof SchemaError) {
-        const record = await store.getSchema(schemaId);
-        render(req, res, 400, "schema-form", editSchemaFormView(record, { error: error.message, document }));
-        return;
+      try {
+        const schema = parseSchemaJson(document);
+        await store.saveSchema(schemaId, schema);
+      } catch (error) {
+        if (error instanceof SchemaError) {
+          const record = await store.getSchema(schemaId);
+          render(req, res, 400, "schema-form", editSchemaFormView(record, { error: error.message, document }));
+          return;
+        }
+        throw error;
       }
-      throw error;
-    }
 
-    res.redirect(303, `/catalog/${schemaId}/`);
-  }));
+      res.redirect(303, `/catalog/${schemaId}/`);
+    }),
+  );
 
-  router.post("/manage/:schemaId/delete", asyncHandler(async (req, res) => {
-    await store.deleteSchema(req.params.schemaId);
-    res.redirect(303, "/catalog/");
-  }));
+  router.post(
+    "/manage/:schemaId/delete",
+    asyncHandler(async (req, res) => {
+      await store.deleteSchema(req.params.schemaId);
+      res.redirect(303, "/catalog/");
+    }),
+  );
 
   return router;
 }
@@ -121,8 +139,11 @@ export function createSchemaManagementErrorHandler({ render }) {
   };
 }
 
-export function sendResponse(res, response) {
-  res.status(response.status).set(response.headers).send(response.body || "");
+function sendResponse(res, response) {
+  res
+    .status(response.status)
+    .set(response.headers)
+    .send(response.body || "");
 }
 
 function asyncHandler(handler) {

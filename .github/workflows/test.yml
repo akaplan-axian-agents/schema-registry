@@ -5,10 +5,68 @@ on:
   merge_group:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  auto-fix:
+    name: Auto-fix source
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Verify auto-fix token is available
+        env:
+          VERSION_BUMP_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
+        run: |
+          if [ -z "$VERSION_BUMP_TOKEN" ]; then
+            echo "VERSION_BUMP_TOKEN is required so auto-fix commits trigger the next workflow run."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.VERSION_BUMP_TOKEN }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply source fixes
+        run: npm run fix:source
+
+      - name: Commit source fixes
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No source fixes produced changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: apply automated source fixes"
+          target_branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          git push origin "HEAD:${target_branch}"
+          echo "Committed source fixes. Failing this run so the next workflow run validates the updated commit."
+          exit 1
+
   test:
     name: Node ${{ matrix.node-version }}
+    needs: auto-fix
+    if: needs.auto-fix.result == 'success' || needs.auto-fix.result == 'skipped'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -28,6 +86,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Check source tools
+        run: npm run check:source
+
+      - name: Run inspect-only checks
+        run: npm run check:inspect
 
       - name: Check coverage thresholds
         run: npm run coverage

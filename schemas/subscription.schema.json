@@ -20,20 +20,11 @@
       "type": "string"
     },
     "status": {
-      "enum": [
-        "trialing",
-        "active",
-        "canceled"
-      ],
+      "enum": ["trialing", "active", "canceled"],
       "type": "string"
     }
   },
-  "required": [
-    "id",
-    "customer_id",
-    "plan",
-    "status"
-  ],
+  "required": ["id", "customer_id", "plan", "status"],
   "title": "Subscription",
   "type": "object"
 }

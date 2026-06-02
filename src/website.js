@@ -55,7 +55,7 @@ export function messageView(titleKey, messageKey = null, message = "") {
   };
 }
 
-export function defaultFormDocument() {
+function defaultFormDocument() {
   return formatSchema({
     $schema: "https://json-schema.org/draft/2020-12/schema",
     title: "New Schema",
