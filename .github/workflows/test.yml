@@ -63,7 +63,7 @@ jobs:
   test:
     name: Node ${{ matrix.node-version }}
     needs: auto-fix
-    if: needs.auto-fix.result == 'success' || needs.auto-fix.result == 'skipped'
+    if: always() && (needs.auto-fix.result == 'success' || needs.auto-fix.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: read
