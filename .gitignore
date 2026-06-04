@@ -12,3 +12,5 @@ crash.log
 crash.*.log
 *.tfvars
 !*.tfvars.example
+!infra/terraform/environments/
+!infra/terraform/environments/*.tfvars
