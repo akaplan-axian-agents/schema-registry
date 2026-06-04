@@ -42,6 +42,32 @@ VIEWS_ROOT=./views
 LOCALES_ROOT=./locales
 ```
 
+## Container
+
+Build the production container image from the repository root:
+
+```sh
+docker build -t schema-registry:local .
+```
+
+Run it with a writable schema data directory:
+
+```sh
+docker run --rm -p 8080:8080 -v "$PWD/schemas:/data/schemas" schema-registry:local
+```
+
+The container binds to `0.0.0.0:8080` and uses `/data/schemas` for persisted
+schema files.
+
+## Azure Deployment
+
+Terraform configuration for Azure Container Apps lives in
+`infra/terraform/`. It provisions Azure Container Registry, Container Apps,
+Log Analytics, managed identity access to pull from the registry, and Azure
+Files storage mounted at `/data/schemas`.
+
+See `infra/terraform/README.md` for the full deployment flow.
+
 ## Storage
 
 Schemas start in `schemas/` as local files. The app depends on the

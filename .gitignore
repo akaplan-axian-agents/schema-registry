@@ -4,3 +4,10 @@ node_modules/
 reports/
 .env
 .DS_Store
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!*.tfvars.example
