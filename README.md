@@ -47,6 +47,8 @@ LOCALES_ROOT=./locales
 Build the production container image from the repository root:
 
 ```sh
+npm ci
+npm run build
 docker build -t schema-registry:local .
 ```
 
@@ -56,8 +58,8 @@ Run it with a writable schema data directory:
 docker run --rm -p 8080:8080 -v "$PWD/schemas:/data/schemas" schema-registry:local
 ```
 
-The container binds to `0.0.0.0:8080` and uses `/data/schemas` for persisted
-schema files.
+The container runs the minified server bundle with `node dist/server.js`, binds
+to `0.0.0.0:8080`, and uses `/data/schemas` for persisted schema files.
 
 ## Azure Deployment
 

@@ -30,11 +30,12 @@ import {
  *   staticRoot: string,
  *   viewsRoot: string,
  *   localesRoot: string,
+ *   version?: string,
  *   i18n?: import("i18next").i18n | null
  * }} options
  * @returns {Promise<import("express").Express>}
  */
-export async function createRegistryApp({ store, staticRoot, viewsRoot, localesRoot, i18n = null }) {
+export async function createRegistryApp({ store, staticRoot, viewsRoot, localesRoot, version = "0.0.0", i18n = null }) {
   const app = express();
   const i18nInstance = i18n || (await createI18n({ localesRoot }));
   /** @type {import("./schema-management.js").RenderFunction} */
@@ -43,6 +44,13 @@ export async function createRegistryApp({ store, staticRoot, viewsRoot, localesR
   app.locals.store = store;
   app.locals.staticRoot = staticRoot;
   app.locals.viewsRoot = viewsRoot;
+
+  app.get("/healthz", (_req, res) => {
+    res.json({
+      status: "ok",
+      version,
+    });
+  });
 
   app.engine(
     "handlebars",

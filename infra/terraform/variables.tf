@@ -7,11 +7,11 @@ variable "subscription_id" {
 variable "name_prefix" {
   description = "Short prefix used for Azure resource names."
   type        = string
-  default     = "schema-registry"
+  default     = "schemaregistry"
 
   validation {
-    condition     = length(var.name_prefix) >= 3 && length(var.name_prefix) <= 31 && can(regex("^[A-Za-z][0-9A-Za-z-]*[0-9A-Za-z]$", var.name_prefix))
-    error_message = "name_prefix must start with a letter, end with a letter or number, and contain 3 to 31 letters, numbers, or hyphens."
+    condition     = can(regex("^[a-z][a-z0-9]{2,13}$", var.name_prefix))
+    error_message = "name_prefix must start with a lowercase letter and contain 3 to 14 lowercase letters or numbers."
   }
 }
 
@@ -21,8 +21,8 @@ variable "environment" {
   default     = "dev"
 
   validation {
-    condition     = length(var.environment) >= 2 && length(var.environment) <= 20 && can(regex("^[0-9a-z][0-9a-z-]*[0-9a-z]$", var.environment))
-    error_message = "environment must start and end with a lowercase letter or number and contain 2 to 20 lowercase letters, numbers, or hyphens."
+    condition     = can(regex("^[a-z][a-z0-9]{1,3}$", var.environment))
+    error_message = "environment must start with a lowercase letter and contain 2 to 4 lowercase letters or numbers."
   }
 }
 

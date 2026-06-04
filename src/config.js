@@ -1,10 +1,15 @@
 import dotenv from "dotenv";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRegistryApp } from "./app.js";
 import { FileSystemSchemaStore } from "./storage.js";
 
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json");
+
 export const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+export const applicationVersion = String(packageJson.version);
 
 const defaults = {
   host: "127.0.0.1",
@@ -66,6 +71,7 @@ export async function buildApp(config = readConfig()) {
     staticRoot: config.staticRoot,
     viewsRoot: config.viewsRoot,
     localesRoot: config.localesRoot,
+    version: applicationVersion,
   });
 }
 

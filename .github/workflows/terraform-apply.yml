@@ -1,0 +1,113 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      name_prefix:
+        description: Azure resource name prefix.
+        required: true
+        default: schemaregistry
+      environment:
+        description: Deployment environment.
+        required: true
+        default: dev
+      location:
+        description: Azure region.
+        required: true
+        default: eastus
+      image_tag:
+        description: Container image tag.
+        required: true
+        default: latest
+      state_resource_group_name:
+        description: Resource group containing the Terraform state storage account.
+        required: true
+      state_storage_account_name:
+        description: Storage account containing the Terraform state container.
+        required: true
+      state_container_name:
+        description: Blob container for Terraform state.
+        required: true
+        default: tfstate
+      state_key:
+        description: Blob name for this deployment's Terraform state.
+        required: true
+        default: schema-registry-dev.tfstate
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apply:
+    name: Apply Azure Container Apps deployment
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: true
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_name_prefix: ${{ inputs.name_prefix }}
+      TF_VAR_environment: ${{ inputs.environment }}
+      TF_VAR_location: ${{ inputs.location }}
+      TF_VAR_image_tag: ${{ inputs.image_tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build minified server
+        run: npm run build
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: |
+          terraform -chdir=infra/terraform init \
+            -backend-config="resource_group_name=${{ inputs.state_resource_group_name }}" \
+            -backend-config="storage_account_name=${{ inputs.state_storage_account_name }}" \
+            -backend-config="container_name=${{ inputs.state_container_name }}" \
+            -backend-config="key=${{ inputs.state_key }}"
+
+      - name: Create image registry
+        run: |
+          terraform -chdir=infra/terraform apply -auto-approve \
+            -target=azurerm_resource_group.app \
+            -target=azurerm_container_registry.app
+
+      - name: Build and push container image
+        run: |
+          registry_server="$(terraform -chdir=infra/terraform output -raw container_registry_login_server)"
+          registry_name="${registry_server%%.*}"
+          image="$(terraform -chdir=infra/terraform output -raw container_image)"
+
+          az acr login --name "$registry_name"
+          docker build --platform linux/amd64 -t "$image" .
+          docker push "$image"
+
+      - name: Apply deployment
+        run: terraform -chdir=infra/terraform apply -auto-approve
+
+      - name: Show service URL
+        run: terraform -chdir=infra/terraform output container_app_url

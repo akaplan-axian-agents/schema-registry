@@ -7,16 +7,12 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  normalized_prefix = trimsuffix(lower(replace(var.name_prefix, "/[^0-9A-Za-z-]/", "-")), "-")
-  compact_prefix    = lower(replace(var.name_prefix, "/[^0-9A-Za-z]/", ""))
-  resource_prefix   = trimsuffix(substr("${local.normalized_prefix}-${var.environment}", 0, 50), "-")
-  unique_suffix     = random_string.suffix.result
-
-  acr_name             = substr("${local.compact_prefix}${local.unique_suffix}", 0, 50)
-  container_app_name   = trimsuffix(substr("ca-${local.normalized_prefix}-${var.environment}", 0, 32), "-")
-  environment_name     = trimsuffix(substr("cae-${local.normalized_prefix}-${var.environment}", 0, 60), "-")
-  storage_account_name = substr("${local.compact_prefix}${local.unique_suffix}", 0, 24)
-  container_image      = "${azurerm_container_registry.app.login_server}/${var.image_name}:${var.image_tag}"
+  resource_name           = "${var.name_prefix}-${var.environment}"
+  unique_resource_name    = "${local.resource_name}-${random_string.suffix.result}"
+  compact_resource_name   = "${var.name_prefix}${var.environment}${random_string.suffix.result}"
+  container_registry_name = local.compact_resource_name
+  storage_account_name    = local.compact_resource_name
+  container_image         = "${azurerm_container_registry.app.login_server}/${var.image_name}:${var.image_tag}"
 
   tags = merge(
     {
@@ -29,13 +25,13 @@ locals {
 }
 
 resource "azurerm_resource_group" "app" {
-  name     = "rg-${local.resource_prefix}"
+  name     = local.unique_resource_name
   location = var.location
   tags     = local.tags
 }
 
 resource "azurerm_log_analytics_workspace" "app" {
-  name                = "log-${local.resource_prefix}"
+  name                = local.unique_resource_name
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   sku                 = "PerGB2018"
@@ -44,7 +40,7 @@ resource "azurerm_log_analytics_workspace" "app" {
 }
 
 resource "azurerm_container_registry" "app" {
-  name                = local.acr_name
+  name                = local.container_registry_name
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
   sku                 = "Basic"
@@ -72,7 +68,7 @@ resource "azurerm_storage_share" "schemas" {
 }
 
 resource "azurerm_container_app_environment" "app" {
-  name                       = local.environment_name
+  name                       = local.unique_resource_name
   location                   = azurerm_resource_group.app.location
   resource_group_name        = azurerm_resource_group.app.name
   logs_destination           = "log-analytics"
@@ -90,7 +86,7 @@ resource "azurerm_container_app_environment_storage" "schemas" {
 }
 
 resource "azurerm_user_assigned_identity" "container_app" {
-  name                = "id-${local.resource_prefix}"
+  name                = local.unique_resource_name
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
   tags                = local.tags
@@ -105,7 +101,7 @@ resource "azurerm_role_assignment" "acr_pull" {
 }
 
 resource "azurerm_container_app" "app" {
-  name                         = local.container_app_name
+  name                         = local.unique_resource_name
   container_app_environment_id = azurerm_container_app_environment.app.id
   resource_group_name          = azurerm_resource_group.app.name
   revision_mode                = "Single"
@@ -192,7 +188,7 @@ resource "azurerm_container_app" "app" {
       startup_probe {
         transport               = "HTTP"
         port                    = var.container_port
-        path                    = "/catalog/"
+        path                    = "/healthz"
         interval_seconds        = 10
         timeout                 = 5
         failure_count_threshold = 12
@@ -201,7 +197,7 @@ resource "azurerm_container_app" "app" {
       liveness_probe {
         transport               = "HTTP"
         port                    = var.container_port
-        path                    = "/catalog/"
+        path                    = "/healthz"
         initial_delay           = 30
         interval_seconds        = 30
         timeout                 = 5
@@ -211,7 +207,7 @@ resource "azurerm_container_app" "app" {
       readiness_probe {
         transport               = "HTTP"
         port                    = var.container_port
-        path                    = "/catalog/"
+        path                    = "/healthz"
         interval_seconds        = 10
         timeout                 = 5
         failure_count_threshold = 3

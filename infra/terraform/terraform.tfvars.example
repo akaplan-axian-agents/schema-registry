@@ -1,5 +1,5 @@
 subscription_id = "00000000-0000-0000-0000-000000000000"
-name_prefix     = "schema-registry"
+name_prefix     = "schemaregistry"
 environment     = "dev"
 location        = "eastus"
 image_tag       = "latest"
