@@ -1,0 +1,4 @@
+state_resource_group_name: schema-registry-tfstate-test
+state_storage_account_name: schemaregtfstatetest
+state_container_name: tfstate
+state_key: schema-registry-test.tfstate

@@ -18,11 +18,11 @@ variable "name_prefix" {
 variable "environment" {
   description = "Deployment environment label used in names and tags."
   type        = string
-  default     = "dev"
+  default     = "test"
 
   validation {
-    condition     = can(regex("^[a-z][a-z0-9]{1,3}$", var.environment))
-    error_message = "environment must start with a lowercase letter and contain 2 to 4 lowercase letters or numbers."
+    condition     = contains(["test", "prod"], var.environment)
+    error_message = "environment must be either test or prod."
   }
 }
 

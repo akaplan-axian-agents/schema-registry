@@ -24,21 +24,28 @@ Set the subscription once per shell, or copy `terraform.tfvars.example` to
 export ARM_SUBSCRIPTION_ID="<azure-subscription-id>"
 ```
 
-Terraform uses the AzureRM backend so apply and teardown runs share state.
-Create a storage account and blob container for Terraform state before running
-the GitHub Actions workflows or local `terraform init`.
+Terraform uses the AzureRM backend so apply and teardown runs share state. The
+backend settings live in `.github/terraform-environments/{environment}.yml`.
+Create the configured storage account and blob container before running the
+GitHub Actions workflows or local `terraform init`.
 
 ## Deploy
+
+Environment-specific Terraform variables live in
+`infra/terraform/environments/{environment}.tfvars`. Supported environments are
+`test` and `prod`.
 
 Create the registry first so there is a place to push the application image:
 
 ```sh
+environment=test
 terraform -chdir=infra/terraform init \
   -backend-config="resource_group_name=<state-resource-group>" \
   -backend-config="storage_account_name=<state-storage-account>" \
   -backend-config="container_name=tfstate" \
-  -backend-config="key=schema-registry-dev.tfstate"
+  -backend-config="key=schema-registry-${environment}.tfstate"
 terraform -chdir=infra/terraform apply \
+  -var-file="environments/${environment}.tfvars" \
   -target=azurerm_resource_group.app \
   -target=azurerm_container_registry.app
 ```
@@ -48,6 +55,7 @@ Build and push the image expected by Terraform:
 ```sh
 npm ci
 npm run build
+export TF_VAR_image_tag="$(node -p 'require("./package.json").version')"
 az acr login --name "$(terraform -chdir=infra/terraform output -raw container_registry_login_server | cut -d. -f1)"
 docker build --platform linux/amd64 \
   -t "$(terraform -chdir=infra/terraform output -raw container_image)" .
@@ -57,7 +65,8 @@ docker push "$(terraform -chdir=infra/terraform output -raw container_image)"
 Apply the full deployment:
 
 ```sh
-terraform -chdir=infra/terraform apply
+terraform -chdir=infra/terraform apply \
+  -var-file="environments/${environment}.tfvars"
 terraform -chdir=infra/terraform output container_app_url
 ```
 
@@ -100,6 +109,8 @@ AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
 ```
 
-Each workflow run also prompts for the AzureRM backend resource group, storage
-account, blob container, and state key. Use the same backend values for apply
-and teardown runs that manage the same deployment.
+Each workflow run only prompts for `environment`, constrained to `test` or
+`prod`. Backend settings come from
+`.github/terraform-environments/{environment}.yml`, Terraform variables come
+from `infra/terraform/environments/{environment}.tfvars`, and the apply
+workflow uses the version in `package.json` as the container image tag.

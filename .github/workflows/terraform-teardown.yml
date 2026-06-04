@@ -3,36 +3,13 @@ name: Terraform Teardown
 on:
   workflow_dispatch:
     inputs:
-      name_prefix:
-        description: Azure resource name prefix.
-        required: true
-        default: schemaregistry
       environment:
         description: Deployment environment.
+        type: choice
         required: true
-        default: dev
-      location:
-        description: Azure region.
-        required: true
-        default: eastus
-      image_tag:
-        description: Container image tag.
-        required: true
-        default: latest
-      state_resource_group_name:
-        description: Resource group containing the Terraform state storage account.
-        required: true
-      state_storage_account_name:
-        description: Storage account containing the Terraform state container.
-        required: true
-      state_container_name:
-        description: Blob container for Terraform state.
-        required: true
-        default: tfstate
-      state_key:
-        description: Blob name for this deployment's Terraform state.
-        required: true
-        default: schema-registry-dev.tfstate
+        options:
+          - test
+          - prod
 
 permissions:
   contents: read
@@ -48,14 +25,28 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_USE_OIDC: true
       TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_name_prefix: ${{ inputs.name_prefix }}
-      TF_VAR_environment: ${{ inputs.environment }}
-      TF_VAR_location: ${{ inputs.location }}
-      TF_VAR_image_tag: ${{ inputs.image_tag }}
+      TF_VAR_image_tag: teardown
+      TF_VAR_FILE: environments/${{ inputs.environment }}.tfvars
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Load environment configuration
+        id: environment-config
+        run: |
+          config_path=".github/terraform-environments/${{ inputs.environment }}.yml"
+          node - "$config_path" <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require("node:fs");
+          const path = process.argv[2];
+          const config = fs.readFileSync(path, "utf8");
+          for (const line of config.split(/\r?\n/)) {
+            const match = line.match(/^([a-z_]+):\s*(.+?)\s*$/);
+            if (match) {
+              console.log(`${match[1]}=${match[2].replace(/^["']|["']$/g, "")}`);
+            }
+          }
+          NODE
 
       - name: Azure login
         uses: azure/login@v2
@@ -70,13 +61,21 @@ jobs:
           terraform_version: 1.6.0
           terraform_wrapper: false
 
+      - name: Restore Terraform init directory
+        uses: actions/cache@v4
+        with:
+          path: infra/terraform/.terraform
+          key: terraform-${{ runner.os }}-${{ inputs.environment }}-${{ hashFiles('infra/terraform/.terraform.lock.hcl', '.github/terraform-environments/*.yml') }}
+          restore-keys: |
+            terraform-${{ runner.os }}-${{ inputs.environment }}-
+
       - name: Terraform init
         run: |
           terraform -chdir=infra/terraform init \
-            -backend-config="resource_group_name=${{ inputs.state_resource_group_name }}" \
-            -backend-config="storage_account_name=${{ inputs.state_storage_account_name }}" \
-            -backend-config="container_name=${{ inputs.state_container_name }}" \
-            -backend-config="key=${{ inputs.state_key }}"
+            -backend-config="resource_group_name=${{ steps.environment-config.outputs.state_resource_group_name }}" \
+            -backend-config="storage_account_name=${{ steps.environment-config.outputs.state_storage_account_name }}" \
+            -backend-config="container_name=${{ steps.environment-config.outputs.state_container_name }}" \
+            -backend-config="key=${{ steps.environment-config.outputs.state_key }}"
 
       - name: Destroy deployment
-        run: terraform -chdir=infra/terraform destroy -auto-approve
+        run: terraform -chdir=infra/terraform destroy -auto-approve -var-file="$TF_VAR_FILE"
