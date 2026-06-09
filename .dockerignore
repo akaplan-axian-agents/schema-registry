@@ -1,0 +1,13 @@
+*
+!dist/
+!dist/**
+!package.json
+!src/
+!src/static/
+!src/static/**
+!views/
+!views/**
+!locales/
+!locales/**
+!schemas/
+!schemas/**

@@ -2,5 +2,15 @@ __pycache__/
 *.py[cod]
 node_modules/
 reports/
+dist/
 .env
 .DS_Store
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!*.tfvars.example
+!infra/terraform/environments/
+!infra/terraform/environments/*.tfvars

@@ -2,11 +2,11 @@ import js from "@eslint/js";
 
 export default [
   {
-    ignores: ["node_modules/**"],
+    ignores: ["dist/**", "node_modules/**"],
   },
   js.configs.recommended,
   {
-    files: ["src/**/*.js", "test/**/*.js", "eslint.config.js"],
+    files: ["scripts/**/*.js", "src/**/*.js", "test/**/*.js", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

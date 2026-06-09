@@ -54,6 +54,25 @@ test("root redirects to catalog and static CSS is served by middleware", async (
   }
 });
 
+test("health check returns status and application version", async () => {
+  const { app, tempDir } = await makeApp();
+  const server = app.listen(0);
+  try {
+    const response = await fetch(serverUrl(server, "/healthz"));
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+    assert.deepEqual(payload, {
+      status: "ok",
+      version: "0.0.0",
+    });
+  } finally {
+    await closeServer(server);
+    await rm(tempDir, { recursive: true, force: true });
+  }
+});
+
 test("catalog is server-rendered HTML without script tags", async () => {
   const { app, tempDir } = await makeApp();
   const server = app.listen(0);

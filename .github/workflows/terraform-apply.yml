@@ -1,0 +1,103 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment.
+        type: choice
+        required: true
+        options:
+          - test
+          - prod
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apply:
+    name: Apply Azure Container Apps deployment
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: true
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_FILE: environments/${{ inputs.environment }}.tfvars
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Load environment configuration
+        id: environment-config
+        run: npm run github:env-config -- ".github/terraform-environments/${{ inputs.environment }}.yml" >> "$GITHUB_OUTPUT"
+
+      - name: Read package version
+        run: node -p '"TF_VAR_image_tag=" + require("./package.json").version' >> "$GITHUB_ENV"
+
+      - name: Build minified server
+        run: npm run build
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+          terraform_wrapper: false
+
+      - name: Restore Terraform init directory
+        uses: actions/cache@v4
+        with:
+          path: infra/terraform/.terraform
+          key: terraform-${{ runner.os }}-${{ inputs.environment }}-${{ hashFiles('infra/terraform/.terraform.lock.hcl', '.github/terraform-environments/*.yml') }}
+          restore-keys: |
+            terraform-${{ runner.os }}-${{ inputs.environment }}-
+
+      - name: Terraform init
+        run: |
+          terraform -chdir=infra/terraform init \
+            -backend-config="resource_group_name=${{ steps.environment-config.outputs.state_resource_group_name }}" \
+            -backend-config="storage_account_name=${{ steps.environment-config.outputs.state_storage_account_name }}" \
+            -backend-config="container_name=${{ steps.environment-config.outputs.state_container_name }}" \
+            -backend-config="key=${{ steps.environment-config.outputs.state_key }}"
+
+      - name: Create image registry
+        run: |
+          terraform -chdir=infra/terraform apply -auto-approve \
+            -var-file="$TF_VAR_FILE" \
+            -target=azurerm_resource_group.app \
+            -target=azurerm_container_registry.app
+
+      - name: Build and push container image
+        run: |
+          registry_server="$(terraform -chdir=infra/terraform output -raw container_registry_login_server)"
+          registry_name="${registry_server%%.*}"
+          image="$(terraform -chdir=infra/terraform output -raw container_image)"
+
+          az acr login --name "$registry_name"
+          docker build --platform linux/amd64 -t "$image" .
+          docker push "$image"
+
+      - name: Apply deployment
+        run: terraform -chdir=infra/terraform apply -auto-approve -var-file="$TF_VAR_FILE"
+
+      - name: Show service URL
+        run: terraform -chdir=infra/terraform output container_app_url

@@ -1,0 +1,4 @@
+state_resource_group_name: schema-registry-tfstate-prod
+state_storage_account_name: schemaregtfstateprod
+state_container_name: tfstate
+state_key: schema-registry-prod.tfstate

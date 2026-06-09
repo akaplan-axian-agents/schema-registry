@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { buildApp, loadDotenv, projectRoot, readConfig } from "../src/config.js";
+import { applicationVersion, buildApp, loadDotenv, projectRoot, readConfig } from "../src/config.js";
+
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json");
 
 test("readConfig uses defaults when env values are absent", () => {
   const config = readConfig({});
@@ -61,6 +65,10 @@ test("loadDotenv reads .env files without overriding existing environment values
 test("buildApp creates an Express app from config", async () => {
   const app = await buildApp(readConfig({}));
   assert.equal(typeof app.listen, "function");
+});
+
+test("applicationVersion matches the package version", () => {
+  assert.equal(applicationVersion, packageJson.version);
 });
 
 function restoreEnv(name, value) {
