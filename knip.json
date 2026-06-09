@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["test/**/*.js", ".github/workflows/*.yml"],
-  "project": ["src/**/*.js", "test/**/*.js"],
+  "entry": ["scripts/**/*.js", "test/**/*.js", ".github/workflows/*.yml"],
+  "project": ["scripts/**/*.js", "src/**/*.js", "test/**/*.js"],
   "ignoreDependencies": ["@secretlint/secretlint-rule-preset-recommend"]
 }

@@ -31,22 +31,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load environment configuration
-        id: environment-config
-        run: |
-          config_path=".github/terraform-environments/${{ inputs.environment }}.yml"
-          node - "$config_path" <<'NODE' >> "$GITHUB_OUTPUT"
-          const fs = require("node:fs");
-          const path = process.argv[2];
-          const config = fs.readFileSync(path, "utf8");
-          for (const line of config.split(/\r?\n/)) {
-            const match = line.match(/^([a-z_]+):\s*(.+?)\s*$/);
-            if (match) {
-              console.log(`${match[1]}=${match[2].replace(/^["']|["']$/g, "")}`);
-            }
-          }
-          NODE
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -55,6 +39,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Load environment configuration
+        id: environment-config
+        run: npm run github:env-config -- ".github/terraform-environments/${{ inputs.environment }}.yml" >> "$GITHUB_OUTPUT"
 
       - name: Read package version
         run: node -p '"TF_VAR_image_tag=" + require("./package.json").version' >> "$GITHUB_ENV"

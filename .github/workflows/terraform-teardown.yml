@@ -32,21 +32,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Load environment configuration
         id: environment-config
-        run: |
-          config_path=".github/terraform-environments/${{ inputs.environment }}.yml"
-          node - "$config_path" <<'NODE' >> "$GITHUB_OUTPUT"
-          const fs = require("node:fs");
-          const path = process.argv[2];
-          const config = fs.readFileSync(path, "utf8");
-          for (const line of config.split(/\r?\n/)) {
-            const match = line.match(/^([a-z_]+):\s*(.+?)\s*$/);
-            if (match) {
-              console.log(`${match[1]}=${match[2].replace(/^["']|["']$/g, "")}`);
-            }
-          }
-          NODE
+        run: npm run github:env-config -- ".github/terraform-environments/${{ inputs.environment }}.yml" >> "$GITHUB_OUTPUT"
 
       - name: Azure login
         uses: azure/login@v2

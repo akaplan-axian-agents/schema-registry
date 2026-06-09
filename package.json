@@ -10,6 +10,7 @@
     "test": "node --test",
     "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-branches=95 --test-coverage-functions=98 --test-coverage-lines=99",
     "mutation": "stryker run",
+    "github:env-config": "node scripts/github-env-config.js",
     "format:check": "prettier \"**/*.{css,js,json,md,yml,yaml}\" --check",
     "format:fix": "prettier \"**/*.{css,js,json,md,yml,yaml}\" --write",
     "deps:check": "knip",
@@ -47,6 +48,7 @@
     "knip": "^6.15.0",
     "prettier": "^3.8.3",
     "secretlint": "^13.0.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.0"
   }
 }
